@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Finance</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0d0f14;
+    --bg-card: #161a22;
+    --bg-card-hover: #1c2029;
+    --text-primary: #eef0f4;
+    --text-secondary: #8a90a0;
+    --accent: #5b8def;
+    --accent-warm: #e8a44a;
+    --border: rgba(255,255,255,0.06);
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body { width: 100%; overflow-x: hidden; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Subtle gradient mesh background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 50% at 20% 10%, rgba(91,141,239,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 80% 30%, rgba(232,164,74,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 50% at 50% 80%, rgba(91,141,239,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 430px; margin: 0 auto; padding-bottom: 40px; }
+
+  /* HEADER */
+  .header {
+    padding: 52px 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .header-icon svg { width: 18px; height: 18px; fill: var(--text-secondary); }
+
+  /* TILE GRID — 6 articles, 2x3 */
+  .tile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 8px 20px 28px;
+  }
+  .tile {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .tile:active { transform: scale(0.97); }
+  .tile:hover { border-color: rgba(255,255,255,0.12); }
+
+  .tile-img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+  }
+  .tile-body {
+    padding: 10px 12px 14px;
+  }
+  .tile-tag {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .tile-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--text-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* SECTION DIVIDER */
+  .section-header {
+    padding: 0 20px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .section-see-all {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.3px;
+  }
+  .section-divider {
+    width: 32px;
+    height: 2px;
+    background: var(--accent);
+    margin: 0 20px 24px;
+    border-radius: 2px;
+    opacity: 0.6;
+  }
+
+  /* CAROUSEL */
+  .carousel-wrap { margin-bottom: 36px; }
+  .carousel {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 20px 4px;
+    scrollbar-width: none;
+  }
+  .carousel::-webkit-scrollbar { display: none; }
+
+  .card {
+    flex: 0 0 260px;
+    scroll-snap-align: start;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .card:active { transform: scale(0.97); }
+
+  .card-img {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    display: block;
+  }
+  .card-body { padding: 14px 16px 16px; }
+  .card-tag {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent-warm);
+    margin-bottom: 6px;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .card-meta {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  /* Placeholder images via CSS gradients */
+  .img-emergency { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+  .img-pixel { background: linear-gradient(135deg, #2d9cdb 0%, #56ccf2 100%); }
+  .img-colitis { background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); }
+  .img-nissan { background: linear-gradient(135deg, #2d3436 0%, #636e72 100%); }
+  .img-loans { background: linear-gradient(135deg, #00b894 0%, #55efc4 100%); }
+  .img-bank { background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%); }
+  .img-credit { background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%); }
+  .img-savings { background: linear-gradient(135deg, #00cec9 0%, #81ecec 100%); }
+  .img-invest { background: linear-gradient(135deg, #6c5ce7 0%, #fd79a8 100%); }
+  .img-retire { background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%); }
+  .img-debt { background: linear-gradient(135deg, #636e72 0%, #b2bec3 100%); }
+  .img-tax { background: linear-gradient(135deg, #2d3436 0%, #00b894 100%); }
+
+  .img-placeholder {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+  }
+  .tile .img-placeholder { aspect-ratio: 4/3; }
+  .card .img-placeholder { aspect-ratio: 16/10; }
+
+  /* Real images from staging */
+  .real-img {
+    width: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .tile .real-img { aspect-ratio: 4/3; }
+  .card .real-img { aspect-ratio: 16/10; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Finance</h1>
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    </div>
+  </div>
+
+  <!-- 6 ARTICLE TILES — 2x3 GRID -->
+  <div class="tile-grid">
+
+    <a class="tile" href="#">
+      <div class="img-placeholder img-emergency">🛟</div>
+      <div class="tile-body">
+        <div class="tile-tag">Savings</div>
+        <div class="tile-title">How Do Emergency Funds Ensure Financial Security?</div>
+      </div>
+    </a>
+
+    <a class="tile" href="#">
+      <div class="img-placeholder img-pixel">📱</div>
+      <div class="tile-body">
+        <div class="tile-tag">Technology</div>
+        <div class="tile-title">What Makes the New Google Pixel Stand Out?</div>
+      </div>
+    </a>
+
+    <a class="tile" href="#">
+      <div class="img-placeholder img-colitis">💊</div>
+      <div class="tile-body">
+        <div class="tile-tag">Health</div>
+        <div class="tile-title">How Does Etrasimod Improve Colitis Treatment?</div>
+      </div>
+    </a>
+
+    <a class="tile" href="#">
+      <div class="img-placeholder img-nissan">🚗</div>
+      <div class="tile-body">
+        <div class="tile-tag">Automotive</div>
+        <div class="tile-title">Why Seniors Are Choosing the Nissan Rogue</div>
+      </div>
+    </a>
+
+    <a class="tile" href="#">
+      <div class="img-placeholder img-loans">💵</div>
+      <div class="tile-body">
+        <div class="tile-tag">Banking</div>
+        <div class="tile-title">How Do Instant Loans Provide Quick Financial Relief?</div>
+      </div>
+    </a>
+
+    <a class="tile" href="#">
+      <div class="img-placeholder img-bank">🏦</div>
+      <div class="tile-body">
+        <div class="tile-tag">Banking</div>
+        <div class="tile-title">How Can Bank Bonuses Boost Your Finances?</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- CAROUSEL: Personal Loans -->
+  <div class="carousel-wrap">
+    <div class="section-header">
+      <span class="section-title">Personal Loans</span>
+      <a href="#" class="section-see-all">See all →</a>
+    </div>
+    <div class="section-divider"></div>
+    <div class="carousel">
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-loans card-img" style="font-size:28px">💰</div>
+        <div class="card-body">
+          <div class="card-tag">Loans</div>
+          <div class="card-title">How Do Instant Loans Provide Quick Financial Relief?</div>
+          <div class="card-meta">5 min read</div>
+        </div>
+      </a>
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-credit card-img" style="font-size:28px">📊</div>
+        <div class="card-body">
+          <div class="card-tag">Loans</div>
+          <div class="card-title">Best Personal Loan Rates: Compare Top Lenders</div>
+          <div class="card-meta">6 min read</div>
+        </div>
+      </a>
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-invest card-img" style="font-size:28px">🏠</div>
+        <div class="card-body">
+          <div class="card-tag">Loans</div>
+          <div class="card-title">Home Equity Loans vs. HELOCs: Which Is Right for You?</div>
+          <div class="card-meta">7 min read</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- CAROUSEL: Credit Cards -->
+  <div class="carousel-wrap">
+    <div class="section-header">
+      <span class="section-title">Credit Cards</span>
+      <a href="#" class="section-see-all">See all →</a>
+    </div>
+    <div class="section-divider"></div>
+    <div class="carousel">
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-credit card-img" style="font-size:28px">💳</div>
+        <div class="card-body">
+          <div class="card-tag">Credit Cards</div>
+          <div class="card-title">Best Credit Card Rewards: Complete Comparison Guide</div>
+          <div class="card-meta">5 min read</div>
+        </div>
+      </a>
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-savings card-img" style="font-size:28px">✈️</div>
+        <div class="card-body">
+          <div class="card-tag">Credit Cards</div>
+          <div class="card-title">Top Travel Rewards Cards for Maximum Miles</div>
+          <div class="card-meta">4 min read</div>
+        </div>
+      </a>
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-debt card-img" style="font-size:28px">🔄</div>
+        <div class="card-body">
+          <div class="card-tag">Credit Cards</div>
+          <div class="card-title">Balance Transfer Cards: Pay Off Debt Faster</div>
+          <div class="card-meta">6 min read</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- CAROUSEL: Savings & Banking -->
+  <div class="carousel-wrap">
+    <div class="section-header">
+      <span class="section-title">Savings & Banking</span>
+      <a href="#" class="section-see-all">See all →</a>
+    </div>
+    <div class="section-divider"></div>
+    <div class="carousel">
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-emergency card-img" style="font-size:28px">🛟</div>
+        <div class="card-body">
+          <div class="card-tag">Savings</div>
+          <div class="card-title">How Do Emergency Funds Ensure Financial Security?</div>
+          <div class="card-meta">6 min read</div>
+        </div>
+      </a>
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-bank card-img" style="font-size:28px">🏦</div>
+        <div class="card-body">
+          <div class="card-tag">Banking</div>
+          <div class="card-title">How Can Bank Bonuses Boost Your Finances?</div>
+          <div class="card-meta">4 min read</div>
+        </div>
+      </a>
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-savings card-img" style="font-size:28px">📈</div>
+        <div class="card-body">
+          <div class="card-tag">Savings</div>
+          <div class="card-title">Best High-Yield Savings Accounts of 2025</div>
+          <div class="card-meta">5 min read</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- CAROUSEL: Investing -->
+  <div class="carousel-wrap">
+    <div class="section-header">
+      <span class="section-title">Investing</span>
+      <a href="#" class="section-see-all">See all →</a>
+    </div>
+    <div class="section-divider"></div>
+    <div class="carousel">
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-invest card-img" style="font-size:28px">📈</div>
+        <div class="card-body">
+          <div class="card-tag">Investing</div>
+          <div class="card-title">Beginner's Guide to Index Fund Investing</div>
+          <div class="card-meta">8 min read</div>
+        </div>
+      </a>
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-retire card-img" style="font-size:28px">🏖️</div>
+        <div class="card-body">
+          <div class="card-tag">Retirement</div>
+          <div class="card-title">How Much Do You Really Need to Retire?</div>
+          <div class="card-meta">7 min read</div>
+        </div>
+      </a>
+
+      <a class="card" href="#">
+        <div class="img-placeholder img-tax card-img" style="font-size:28px">📋</div>
+        <div class="card-body">
+          <div class="card-tag">Tax</div>
+          <div class="card-title">Tax-Advantaged Accounts: Maximize Your Returns</div>
+          <div class="card-meta">6 min read</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Smooth horizontal scroll behavior
+document.querySelectorAll('.carousel').forEach(c => {
+  let isDown = false, startX, scrollLeft;
+  c.addEventListener('mousedown', e => { isDown = true; startX = e.pageX - c.offsetLeft; scrollLeft = c.scrollLeft; });
+  c.addEventListener('mouseleave', () => isDown = false);
+  c.addEventListener('mouseup', () => isDown = false);
+  c.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); c.scrollLeft = scrollLeft - (e.pageX - c.offsetLeft - startX) * 1.5; });
+});
+</script>
+</body>
+</html>
